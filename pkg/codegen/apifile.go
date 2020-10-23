@@ -49,6 +49,7 @@ func GenerateCRDFiles(g *generate.Generator, apiPath string) error {
 		return errors.Wrap(err, "cannot generate CRDs")
 	}
 	for _, crd := range crds {
+		// TODO(muvaf): ACK hard-codes the suffix for the API group as "services.k8s.aws"
 		content, err := g.GenerateCRDFile(crd.Names.Original)
 		if err != nil {
 			return errors.Wrap(err, "cannot generate crd file")

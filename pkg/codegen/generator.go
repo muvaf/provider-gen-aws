@@ -39,6 +39,10 @@ type APIFileGenerator interface {
 	Generate(g *generate.Generator, apiPath string) error
 }
 
+type ControllerGenerator interface {
+	Generate(g *generate.Generator, controllerPath string) error
+}
+
 func NewGeneration(serviceName, serviceVersion, apiVersion, providerDirectory, sdkBasePath, templatePath string, opts ...GenerationOption) *Generation {
 	g := &Generation{
 		ServiceName:       serviceName,
@@ -47,12 +51,16 @@ func NewGeneration(serviceName, serviceVersion, apiVersion, providerDirectory, s
 		ProviderDirectory: providerDirectory,
 		SDKBasePath:       sdkBasePath,
 		TemplateBasePath:  templatePath,
-		files: APIFileGeneratorChain{
+		apis: APIFileGeneratorChain{
 			GenerateCRDFiles,
 			GenerateTypesFile,
 			GenerateEnumsFile,
 			GenerateGroupVersionInfoFile,
 			GenerateDocFile,
+		},
+		controller: ControllerGeneratorChain{
+			GenerateController,
+			GenerateConversions,
 		},
 	}
 	for _, o := range opts {
@@ -70,11 +78,13 @@ type Generation struct {
 	TemplateBasePath        string
 	GeneratorConfigFilePath string
 
-	files APIFileGenerator
+	apis       APIFileGenerator
+	controller ControllerGenerator
 }
 
 func (g *Generation) Generate() error {
 	apiPath := filepath.Join(g.ProviderDirectory, "apis", strings.Split(g.ServiceName, "/")[0], g.APIVersion)
+	controllerPath := filepath.Join(g.ProviderDirectory, "pkg", "controller", strings.Split(g.ServiceName, "/")[0])
 	sdkHelper := model.NewSDKHelper(g.SDKBasePath)
 	sdkAPI, err := sdkHelper.API(g.ServiceName)
 	if err != nil {
@@ -84,13 +94,20 @@ func (g *Generation) Generate() error {
 	if err != nil {
 		return errors.Wrap(err, "cannot create a new ACK Generator")
 	}
-	if err := os.MkdirAll(apiPath, os.ModePerm); err != nil {
-		return errors.Wrap(err, "cannot create api folder")
+
+	for _, path := range []string{apiPath, controllerPath} {
+		if err := os.MkdirAll(path, os.ModePerm); err != nil {
+			return errors.Wrap(err, "cannot create api folder")
+		}
 	}
 	// TODO(muvaf): ACK generator requires all template files to be present during
 	// initTemplates even though we don't use them.
-	if err := g.files.Generate(o, apiPath); err != nil {
+	if err := g.apis.Generate(o, apiPath); err != nil {
 		return errors.Wrap(err, "cannot generate API files")
+	}
+
+	if err := g.controller.Generate(o, controllerPath); err != nil {
+		return errors.Wrap(err, "cannot generate controller files")
 	}
 	return nil
 }

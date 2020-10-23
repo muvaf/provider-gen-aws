@@ -90,7 +90,9 @@ func (g *Generation) Generate() error {
 	if err != nil {
 		return errors.Wrap(err, "cannot get the API model for service")
 	}
-	o, err := generate.New(sdkAPI, g.APIVersion, g.GeneratorConfigFilePath, g.TemplateBasePath)
+	o, err := generate.New(sdkAPI, g.APIVersion, g.GeneratorConfigFilePath, g.TemplateBasePath,
+		generate.WithCustomSpecFieldPath(".Spec.ForProvider"),
+		generate.WithCustomStatusFieldPath(".Status.AtProvider"))
 	if err != nil {
 		return errors.Wrap(err, "cannot create a new ACK Generator")
 	}

@@ -104,7 +104,7 @@ func (e *external) Create(ctx context.Context, mg cpresource.Managed) (managed.E
 	}
 	cr.Status.SetConditions(runtimev1alpha1.Creating())
 	input := Generate{{ .CRD.Ops.Create.InputRef.Shape.ShapeName }}(cr)
-  {{ $createCode := GoCodeSetCreateOutput .CRD "resp" "cr.Status.AtProvider" 1 false }}
+  {{ $createCode := GoCodeSetCreateOutput .CRD "resp" "cr" 1 false }}
   	{{ if and .CRD.StatusFields ( not ( Empty $createCode ) ) }}resp{{ else }}_{{ end }}, err := e.client.{{ .CRD.Ops.Create.Name }}WithContext(ctx, input)
   	if err != nil {
   	  return managed.ExternalCreation{}, errors.Wrap(err, errCreate)

@@ -2,6 +2,8 @@ module github.com/crossplane/provider-template
 
 go 1.13
 
+replace github.com/aws/aws-controllers-k8s => github.com/muvaf/aws-controllers-k8s v0.0.0-20201023145247-99e2d13d4f41
+
 require (
 	github.com/aws/aws-controllers-k8s v0.0.0-20201022191406-64428498d932
 	github.com/aws/aws-sdk-go v1.34.32

@@ -110,7 +110,7 @@ func (e *external) Observe(ctx context.Context, mg cpresource.Managed) (managed.
 	found := false
 	for _, elem := range resp.Repositories {
 		if elem.CreatedAt != nil {
-			cr.Status.CreatedAt = &metav1.Time{*elem.CreatedAt}
+			cr.Status.AtProvider.CreatedAt = &metav1.Time{*elem.CreatedAt}
 		}
 		if elem.EncryptionConfiguration != nil {
 			f1 := &svcapitypes.EncryptionConfiguration{}
@@ -120,20 +120,20 @@ func (e *external) Observe(ctx context.Context, mg cpresource.Managed) (managed.
 			if elem.EncryptionConfiguration.KmsKey != nil {
 				f1.KMSKey = elem.EncryptionConfiguration.KmsKey
 			}
-			cr.Spec.EncryptionConfiguration = f1
+			cr.Spec.ForProvider.EncryptionConfiguration = f1
 		}
 		if elem.ImageScanningConfiguration != nil {
 			f2 := &svcapitypes.ImageScanningConfiguration{}
 			if elem.ImageScanningConfiguration.ScanOnPush != nil {
 				f2.ScanOnPush = elem.ImageScanningConfiguration.ScanOnPush
 			}
-			cr.Spec.ImageScanningConfiguration = f2
+			cr.Spec.ForProvider.ImageScanningConfiguration = f2
 		}
 		if elem.ImageTagMutability != nil {
-			cr.Spec.ImageTagMutability = elem.ImageTagMutability
+			cr.Spec.ForProvider.ImageTagMutability = elem.ImageTagMutability
 		}
 		if elem.RegistryId != nil {
-			cr.Status.RegistryID = elem.RegistryId
+			cr.Status.AtProvider.RegistryID = elem.RegistryId
 		}
 		if elem.RepositoryArn != nil {
 			if cr.Status.ACKResourceMetadata == nil {
@@ -143,10 +143,10 @@ func (e *external) Observe(ctx context.Context, mg cpresource.Managed) (managed.
 			cr.Status.ACKResourceMetadata.ARN = &tmpARN
 		}
 		if elem.RepositoryName != nil {
-			cr.Spec.RepositoryName = elem.RepositoryName
+			cr.Spec.ForProvider.RepositoryName = elem.RepositoryName
 		}
 		if elem.RepositoryUri != nil {
-			cr.Status.RepositoryURI = elem.RepositoryUri
+			cr.Status.AtProvider.RepositoryURI = elem.RepositoryUri
 		}
 		found = true
 		break
@@ -176,20 +176,20 @@ func (e *external) Create(ctx context.Context, mg cpresource.Managed) (managed.E
   	}
   
 	if resp.Repository.CreatedAt != nil {
-		cr.Status.AtProvider.Status.CreatedAt = &metav1.Time{*resp.Repository.CreatedAt}
+		cr.Status.AtProvider.CreatedAt = &metav1.Time{*resp.Repository.CreatedAt}
 	}
 	if resp.Repository.RegistryId != nil {
-		cr.Status.AtProvider.Status.RegistryID = resp.Repository.RegistryId
+		cr.Status.AtProvider.RegistryID = resp.Repository.RegistryId
 	}
-	if cr.Status.AtProvider.Status.ACKResourceMetadata == nil {
-		cr.Status.AtProvider.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
+	if cr.Status.ACKResourceMetadata == nil {
+		cr.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
 	}
 	if resp.Repository.RepositoryArn != nil {
 		arn := ackv1alpha1.AWSResourceName(*resp.Repository.RepositoryArn)
-		cr.Status.AtProvider.Status.ACKResourceMetadata.ARN = &arn
+		cr.Status.ACKResourceMetadata.ARN = &arn
 	}
 	if resp.Repository.RepositoryUri != nil {
-		cr.Status.AtProvider.Status.RepositoryURI = resp.Repository.RepositoryUri
+		cr.Status.AtProvider.RepositoryURI = resp.Repository.RepositoryUri
 	}
 
 	return managed.ExternalCreation{}, nil

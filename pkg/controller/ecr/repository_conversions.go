@@ -25,8 +25,8 @@ import (
 func GenerateDescribeRepositoriesInput(cr *v1alpha1.Repository) *svcsdk.DescribeRepositoriesInput {
 	res := &svcsdk.DescribeRepositoriesInput{}
 
-	if cr.Status.RegistryID != nil {
-		res.SetRegistryId(*cr.Status.RegistryID)
+	if cr.Status.AtProvider.RegistryID != nil {
+		res.SetRegistryId(*cr.Status.AtProvider.RegistryID)
 	}
 
 	return res
@@ -37,32 +37,32 @@ func GenerateDescribeRepositoriesInput(cr *v1alpha1.Repository) *svcsdk.Describe
 func GenerateCreateRepositoryInput(cr *v1alpha1.Repository) *svcsdk.CreateRepositoryInput {
 	res := &svcsdk.CreateRepositoryInput{}
 
-	if cr.Spec.EncryptionConfiguration != nil {
+	if cr.Spec.ForProvider.EncryptionConfiguration != nil {
 		f0 := &svcsdk.EncryptionConfiguration{}
-		if cr.Spec.EncryptionConfiguration.EncryptionType != nil {
-			f0.SetEncryptionType(*cr.Spec.EncryptionConfiguration.EncryptionType)
+		if cr.Spec.ForProvider.EncryptionConfiguration.EncryptionType != nil {
+			f0.SetEncryptionType(*cr.Spec.ForProvider.EncryptionConfiguration.EncryptionType)
 		}
-		if cr.Spec.EncryptionConfiguration.KMSKey != nil {
-			f0.SetKmsKey(*cr.Spec.EncryptionConfiguration.KMSKey)
+		if cr.Spec.ForProvider.EncryptionConfiguration.KMSKey != nil {
+			f0.SetKmsKey(*cr.Spec.ForProvider.EncryptionConfiguration.KMSKey)
 		}
 		res.SetEncryptionConfiguration(f0)
 	}
-	if cr.Spec.ImageScanningConfiguration != nil {
+	if cr.Spec.ForProvider.ImageScanningConfiguration != nil {
 		f1 := &svcsdk.ImageScanningConfiguration{}
-		if cr.Spec.ImageScanningConfiguration.ScanOnPush != nil {
-			f1.SetScanOnPush(*cr.Spec.ImageScanningConfiguration.ScanOnPush)
+		if cr.Spec.ForProvider.ImageScanningConfiguration.ScanOnPush != nil {
+			f1.SetScanOnPush(*cr.Spec.ForProvider.ImageScanningConfiguration.ScanOnPush)
 		}
 		res.SetImageScanningConfiguration(f1)
 	}
-	if cr.Spec.ImageTagMutability != nil {
-		res.SetImageTagMutability(*cr.Spec.ImageTagMutability)
+	if cr.Spec.ForProvider.ImageTagMutability != nil {
+		res.SetImageTagMutability(*cr.Spec.ForProvider.ImageTagMutability)
 	}
-	if cr.Spec.RepositoryName != nil {
-		res.SetRepositoryName(*cr.Spec.RepositoryName)
+	if cr.Spec.ForProvider.RepositoryName != nil {
+		res.SetRepositoryName(*cr.Spec.ForProvider.RepositoryName)
 	}
-	if cr.Spec.Tags != nil {
+	if cr.Spec.ForProvider.Tags != nil {
 		f4 := []*svcsdk.Tag{}
-		for _, f4iter := range cr.Spec.Tags {
+		for _, f4iter := range cr.Spec.ForProvider.Tags {
 			f4elem := &svcsdk.Tag{}
 			if f4iter.Key != nil {
 				f4elem.SetKey(*f4iter.Key)
@@ -83,11 +83,11 @@ func GenerateCreateRepositoryInput(cr *v1alpha1.Repository) *svcsdk.CreateReposi
 func GenerateDeleteRepositoryInput(cr *v1alpha1.Repository) *svcsdk.DeleteRepositoryInput {
 	res := &svcsdk.DeleteRepositoryInput{}
 
-	if cr.Status.RegistryID != nil {
-		res.SetRegistryId(*cr.Status.RegistryID)
+	if cr.Status.AtProvider.RegistryID != nil {
+		res.SetRegistryId(*cr.Status.AtProvider.RegistryID)
 	}
-	if cr.Spec.RepositoryName != nil {
-		res.SetRepositoryName(*cr.Spec.RepositoryName)
+	if cr.Spec.ForProvider.RepositoryName != nil {
+		res.SetRepositoryName(*cr.Spec.ForProvider.RepositoryName)
 	}
 
 	return res
